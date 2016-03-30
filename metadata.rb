@@ -1,4 +1,4 @@
-name 'deploy_core'
+name 'common_deploy'
 maintainer 'Jonathan Serafini'
 maintainer_email 'jonathan@serafini.ca'
 source_url 'https://github.com/JonathanSerafini/chef-common_deploy'
