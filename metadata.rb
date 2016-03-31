@@ -7,5 +7,5 @@ license 'apachev2'
 description 'Common chef cookbook providing attribute driven application deployments'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 chef_version '>= 12.7'
-version '0.1.1'
+version '0.1.2'
 depends 'common_attrs'
