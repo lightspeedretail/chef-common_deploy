@@ -80,7 +80,7 @@ end
 action :sync do
   directory new_resource.destination do
 		user new_resource.user
-    group new_resurce.group
+    group new_resource.group
     recursive true
   end
 
@@ -111,7 +111,7 @@ action :sync do
       command string
       environment new_resource.environment
       action :nothing
-      subscribes :run, resource(git: new_resource.destination), :immediately
+      subscribes :run, resources(git: new_resource.destination), :immediately
     end
   end
 end
