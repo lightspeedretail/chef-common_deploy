@@ -5,11 +5,11 @@
 # On each invocation, create a common_deploy_template resource if required.
 # @since 0.1.0
 CommonDeploy::Applications.each do |application_name, hash|
-	if templates = hash.fetch(:templates, {})
-		hash.each do |name, template_hash|
+	if templates = hash.fetch(:templates, nil)
+		templates.each do |name, template_hash|
 			common_deploy_template name do
         application application_name
-        config CommonDeploy::Config.fetch(application_name)
+        configs CommonDeploy::Configs.fetch(application_name)
         common_properties template_hash
       end
     end

@@ -31,6 +31,10 @@ property :cookbook,
 property :local,
   kind_of: [TrueClass, FalseClass]
 
+# Indicate that the template contains passwords
+property :sensitive,
+  kind_of: [TrueClass, FalseClass]
+
 # Variables to make available to the template
 # - These should be considered as local overrides to the attributes provided
 # by the `configs` property.
@@ -62,11 +66,11 @@ action :create do
   template_variables = Chef::Mixin::DeepMerge.
     merge(new_resource.variables, new_resource.configs)
 
-  template new_resource.name do
-    %w(path owner group mode source cookbook local).each do |key|
-      send(key.to_sym, new_resource.send(key.to_sym))
-    end
-    variables template_variables
+  r = template new_resource.name
+  r.variables template_variables
+
+  %w(path owner group mode source cookbook local sensitive).each do |key|
+    r.send(key.to_sym, new_resource.send(key.to_sym))
   end
 end
 
