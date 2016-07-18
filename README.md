@@ -2,6 +2,8 @@
 
 A cookbook which provides tools to help deploy simple applications in a standardized way via node attributes. This is designed to be used with PolicyFiles and the suite of `common_*` cookbooks so that applications may be deployed without necessarily requiring a dedicated cookbook.
 
+*Warning*: This cookbook is not yet ready for public consumption
+
 # Requirements
 
 This cookbook requires *Chef 12.7.0* or later.
