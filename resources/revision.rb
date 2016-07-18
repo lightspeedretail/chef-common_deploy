@@ -1,5 +1,5 @@
 # The common_deploy_revision resource functions similarly Chef's deploy_revision
-# resource in that it publishs you to deploy applications in an atomic manner
+# resource in that it enables you to deploy applications in an atomic manner
 # in much the same way that Capistrano functions.
 #
 # The main difference lies in the fact that this resource provides for more

@@ -15,4 +15,3 @@ CommonDeploy::Applications.each do |application_name, hash|
     end
   end
 end
-

@@ -11,4 +11,3 @@ CommonDeploy::Applications.each do |application, hash|
     end
   end
 end
-

@@ -39,4 +39,3 @@ default[:common_deploy].tap do |config|
   # @since 0.1.0
   config[:default] ||= {}
 end
-
