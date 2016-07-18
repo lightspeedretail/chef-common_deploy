@@ -25,7 +25,7 @@ module CommonDeploy
       # @since 0.1.0
       def fetch(app_name)
         application_hash = source.fetch(app_name, {})
-        default_hash = default.select{|k,_| application_hash.key?(k)}
+        default_hash = default.select { |k, _| application_hash.key?(k) }
 
         Chef::Mixin::DeepMerge.merge(default_hash, application_hash)
       end
@@ -35,10 +35,10 @@ module CommonDeploy
       # @return [Array]
       # @since 0.1.0
       def all
-        source.keys.
-          select{|k| k != :default}.
-          map{|k| [k,fetch(k)]}.
-          sort_by{|_,h| h[:order] || 100}
+        source.keys
+          .select { |k| k != :default }
+          .map { |k| [k, fetch(k)] }
+          .sort_by { |_, h| h[:order] || 100 }
       end
 
       # Iterate over the applications, yielding to a block.
@@ -46,7 +46,7 @@ module CommonDeploy
       # @yield [String,Hash] the AppName and AppHash
       # @since 0.1.0
       def each
-        all.each{|k,h| yield(k,h)}
+        all.each { |k, h| yield(k, h) }
       end
     end
   end

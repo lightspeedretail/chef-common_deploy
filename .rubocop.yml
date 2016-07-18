@@ -1,0 +1,9 @@
+Style/AndOr:
+  Enabled: false
+
+Style/EmptyLiteral:
+  Enabled: false
+
+Style/MultilineMethodCallIndentation:
+  Enabled: false
+

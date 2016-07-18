@@ -1,4 +1,3 @@
-
 default[:common_deploy].tap do |config|
   # Namespace for default attributes which will provide a baseline for all
   # applications deployed here.
@@ -7,7 +6,7 @@ default[:common_deploy].tap do |config|
   # data is a hash of resources to create and which are provided by this
   # cookbook.
   #
-  # The contents of :default should be the same, in this case providing the 
+  # The contents of :default should be the same, in this case providing the
   # default values for all further resources.
   #
   # @example
@@ -39,4 +38,3 @@ default[:common_deploy].tap do |config|
   # @since 0.1.0
   config[:default] ||= {}
 end
-
