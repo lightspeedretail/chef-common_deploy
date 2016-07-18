@@ -4,18 +4,18 @@
 #
 # On each invocation, create package resources if required.
 # @since 0.1.0
-CommonDeploy::Applications.each do |application, hash|
-  if packages = hash.fetch(:packages, nil)
-    packages.each do |name, hash|
-      hash = case hash
-             when true then { action: "install" }
-             when false then { action: "remove" }
-             end
+CommonDeploy::Applications.each do |_, hash|
+  next unless hash.key?('packages')
 
-      package name do
-        common_properties(hash)
-      end
+  hash['packages'].each do |name, package_hash|
+    properties = case package_hash
+                 when true then { 'action' => 'install' }
+                 when false then { 'action' => 'remove' }
+                 else package_hash
+                 end
+
+    package name do
+      common_properties(properties)
     end
   end
 end
-

@@ -5,10 +5,9 @@
 # On each invocation, create a common_deploy_repository resource if required.
 # @since 0.1.0
 CommonDeploy::Applications.each do |application, hash|
-  if repository = hash.fetch(:repository, nil)
-    common_deploy_repository application do
-      common_properties repository
-    end
+  next unless hash.key?('repository')
+
+  common_deploy_repository application do
+    common_properties hash.fetch('repository', nil)
   end
 end
-

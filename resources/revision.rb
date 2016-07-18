@@ -1,10 +1,10 @@
 # The common_deploy_revision resource functions similarly Chef's deploy_revision
-# resource in that it publishs you to deploy applications in an atomic manner
+# resource in that it enables you to deploy applications in an atomic manner
 # in much the same way that Capistrano functions.
 #
 # The main difference lies in the fact that this resource provides for more
 # execution hooks granting a better control over how and when steps are
-# executed. 
+# executed.
 #
 # @example
 # ```ruby
@@ -85,7 +85,7 @@ property :repository,
 property :revision,
   kind_of: String,
   identity: true,
-  default: "HEAD"
+  default: 'HEAD'
 
 # Optional options to pass to the SCM provider
 # @since 0.1.0
@@ -109,29 +109,29 @@ property :environment,
 # @since 0.1.0
 property :purge_on_build,
   kind_of: Array,
-  default: %w{log tmp/pids public/system}
+  default: %w(log tmp/pids public/system)
 
 # Array of directories to create when building the release artifact
 # @since 0.1.0
 property :create_on_build,
   kind_of: Array,
-  default: %w{tmp public config}
+  default: %w(tmp public config)
 
 # Hash of release >to> shared paths for which to create symlinks
 # @since 0.1.0
 property :symlink_on_build,
   kind_of: Hash,
   default: {
-    "system" => "public/system", 
-    "pids" => "tmp/pids",
-    "log" => "log"
+    'system' => 'public/system',
+    'pids' => 'tmp/pids',
+    'log' => 'log'
   }
 
 # Name of the cache directory to create within deploy_to
 # @since 0.1.0
 property :cache_name,
   kind_of: String,
-  default: "repo"
+  default: 'repo'
 
 # Absolute path of the cache dir to create
 # @since 0.1.0
@@ -215,50 +215,50 @@ def scm_provider(run_context = nil)
   resource = scm_resource.new(current_resource.name, run_context)
   resource.repository   current_resource.repository
   resource.revision     current_resource.revision
-  current_resource.scm_options.each do |k,v|
+  current_resource.scm_options.each do |k, v|
     resource.send(k, v)
   end
   resource.provider_for_action(:checkout)
 end
 
 def after_cache(&block)
-  set_or_return(:after_cache, block, :kind_of => Proc)
+  set_or_return(:after_cache, block, kind_of: Proc)
 end
 
 def before_build(&block)
-  set_or_return(:before_build, block, :kind_of => Proc)
+  set_or_return(:before_build, block, kind_of: Proc)
 end
 
 def after_build(&block)
-  set_or_return(:after_build, block, :kind_of => Proc)
+  set_or_return(:after_build, block, kind_of: Proc)
 end
 
 def validate_migrate(&block)
-  set_or_return(:validate_migrate, block, :kind_of => Proc)
+  set_or_return(:validate_migrate, block, kind_of: Proc)
 end
 
 def before_migration(&block)
-  set_or_return(:before_migration, block, :kind_of => Proc)
+  set_or_return(:before_migration, block, kind_of: Proc)
 end
 
 def migrate_action(&block)
-  set_or_return(:migrate_action, block, :kind_of => Proc)
+  set_or_return(:migrate_action, block, kind_of: Proc)
 end
 
 def after_migration(&block)
-  set_or_return(:after_migration, block, :kind_of => Proc)
+  set_or_return(:after_migration, block, kind_of: Proc)
 end
 
 def validate_publish(&block)
-  set_or_return(:validate_publish, block, :kind_of => Proc)
+  set_or_return(:validate_publish, block, kind_of: Proc)
 end
 
 def before_publish(&block)
-  set_or_return(:before_publish, block, :kind_of => Proc)
+  set_or_return(:before_publish, block, kind_of: Proc)
 end
 
 def after_publish(&block)
-  set_or_return(:after_publish, block, :kind_of => Proc)
+  set_or_return(:after_publish, block, kind_of: Proc)
 end
 
 # Load the current resource to determine which portions have changed and thus
@@ -273,7 +273,7 @@ load_current_value do |desired|
     send(p, desired.send(p))
   end
 
-  current_value_does_not_exist! unless ::File.exists?(desired.release_path)
+  current_value_does_not_exist! unless ::File.exist?(desired.release_path)
 
   purge_on_build begin
     desired.purge_on_build.select do |path|
@@ -289,23 +289,23 @@ load_current_value do |desired|
   end
 
   symlink_on_build begin
-    desired.symlink_on_build.select do |src,dst|
+    desired.symlink_on_build.select do |src, dst|
       src_path = ::File.join(desired.shared_path, src)
       dst_path = ::File.join(desired.release_path, dst)
       ::File.symlink?(dst_path) and ::File.realpath(dst_path) == src_path
     end
   end
 
-  current_path 'missing' unless ::File.exists?(desired.current_path)
+  current_path 'missing' unless ::File.exist?(desired.current_path)
 
   release_path begin
     path = ::File.readlink(current_path)
-    ::File.exists?(release_path) ? path : nil
-  end if ::File.exists?(current_path)
+    ::File.exist?(release_path) ? path : nil
+  end if ::File.exist?(current_path)
 
   if desired.support_force
     release_hash 'force_deploy'
-  else 
+  else
     release_hash ::File.basename(release_path)
   end
 end
@@ -343,7 +343,7 @@ action_class do
   def supports?(key)
     new_resource.send("support_#{key}")
   end
-  
+
   # Helper method to dynamically change supported features during execution,
   # thus ensuring that hooks may trigger whether other hooks are run. For
   # instance, before_migrate could have logic which determines whether
@@ -369,7 +369,7 @@ action_class do
   # Helper method to return shortend relative paths used in resource names.
   # @since 0.1.0
   def release_name(arg = nil)
-    ::File.join("release", arg)
+    ::File.join('release', arg)
   end
 
   # Helper method providing a shorthand to return the cache_path or a join
@@ -395,7 +395,7 @@ action_class do
   # Helper method to return shortend relative paths used in resource names.
   # @since 0.1.0
   def shared_name(arg = nil)
-    ::File.join("shared", arg)
+    ::File.join('shared', arg)
   end
 
   # Helper method providing a shorthand to return the shared_path or a join
@@ -417,7 +417,7 @@ action_class do
       group new_resource.group
       cwd   new_resource.release_path
       environment new_resource.environment
-      instance_eval &block
+      instance_eval(&block)
     end
   end
 
@@ -429,7 +429,7 @@ action_class do
       path  release_path(name)
       owner new_resource.user
       group new_resource.group
-      instance_eval &block
+      instance_eval(&block)
     end
   end
 
@@ -441,24 +441,24 @@ action_class do
       path  shared_path(name)
       owner new_resource.user
       group new_resource.group
-      instance_eval &block
+      instance_eval(&block)
     end
   end
 
   # Method returning a list of paths for all current releases
   # @since 0.1.0
   def all_releases
-    ::Dir.glob(::File.join(new_resource.deploy_to,"/releases/*")).
-      sort_by {|path| ::File.mtime(path)}
+    ::Dir.glob(::File.join(new_resource.deploy_to, '/releases/*'))
+      .sort_by { |path| ::File.mtime(path) }
   end
 
   # Actions to perform when opting to force_deploy.
-  # This entails deleting the current release irrespective of whether it is 
+  # This entails deleting the current release irrespective of whether it is
   # currently live or not and then performing standard build steps.
   # @since 0.1.0
   def purge_release
-    converge_by "purge release_path" do
-      directory "delete release_path" do
+    converge_by 'purge release_path' do
+      directory 'delete release_path' do
         path  release_path
         owner new_resource.user
         group new_resource.group
@@ -467,9 +467,9 @@ action_class do
     end if supports?('force')
   end
 
-  # Actions to perform when downloading source code from the SCM Provider. 
-  # These will go through downloading to a cached folder, copying the cache to 
-  # a unique release folder, adding a RELEASE file and then running the 
+  # Actions to perform when downloading source code from the SCM Provider.
+  # These will go through downloading to a cached folder, copying the cache to
+  # a unique release folder, adding a RELEASE file and then running the
   # after_cache hook.
   # @since 0.1.0
   def cache_release
@@ -489,7 +489,7 @@ action_class do
         end
       end
 
-      directory "create release_path" do
+      directory 'create release_path' do
         path  release_path
         owner new_resource.user
         group new_resource.group
@@ -500,7 +500,7 @@ action_class do
           FileUtils.cp_r(
             cache_path('.'),
             release_path,
-            :preserve => true
+            preserve: true
           )
         end
       end
@@ -512,19 +512,19 @@ action_class do
         content new_resource.release_hash
       end
 
-      converge_by "execute after_cache" do
+      converge_by 'execute after_cache' do
         instance_eval(&new_resource.after_cache)
       end if new_resource.after_cache
     end
   end
 
   # Actions to perform when preparing a cached release for deployment.
-  # This includes executing before_build callbacks, deleting original source 
-  # folders, creating new folders, adding symlinks to folders shared amongst 
+  # This includes executing before_build callbacks, deleting original source
+  # folders, creating new folders, adding symlinks to folders shared amongst
   # all releases, and then executing the after_build hook.
   # @since 0.1.0
   def build_release
-    converge_by "execute before_build" do
+    converge_by 'execute before_build' do
       instance_eval(&new_resource.before_build)
     end if new_resource.before_build
 
@@ -559,7 +559,7 @@ action_class do
       end
     end
 
-    converge_by "execute after_build" do
+    converge_by 'execute after_build' do
       instance_eval(&new_resource.after_build)
     end if new_resource.after_build
   end
@@ -569,23 +569,23 @@ action_class do
   # migrate_action callback and lastly executing the after_migration callback.
   # @since 0.1.0
   def migrate_release
-    converge_by "execute validate_migrate" do
+    converge_by 'execute validate_migrate' do
       instance_eval(&new_resource.validate_migrate)
     end if new_resource.validate_migrate
 
     converge_if_changed :release_path, :current_path do
-      converge_by "execute before_migration" do
+      converge_by 'execute before_migration' do
         instance_eval(&new_resource.before_migration)
       end if new_resource.before_migration
 
-      converge_by "execute migrations" do
+      converge_by 'execute migrations' do
         instance_eval(&new_resource.migrate_action)
       end if new_resource.migrate_action
 
-      converge_by "execute after_migration" do
+      converge_by 'execute after_migration' do
         instance_eval(&new_resource.after_migration)
       end if new_resource.after_migration
-    end if supports?("migrate")
+    end if supports?('migrate')
   end
 
   # Actions to perform when enabling or replacing the release.
@@ -593,22 +593,22 @@ action_class do
   # current_path symlink and lastly calling the after_publish callback.
   # @since 0.1.0
   def publish_release
-    converge_by "execute validate_publish" do
+    converge_by 'execute validate_publish' do
       instance_eval(&new_resource.validate_publish)
     end if new_resource.validate_publish
 
     converge_if_changed :release_path, :current_path do
-      converge_by "execute before_publish" do
+      converge_by 'execute before_publish' do
         instance_eval(&new_resource.before_publish)
       end if new_resource.before_publish
 
       converge_by "publish #{new_resource.release_hash}" do
         link current_path do
           to release_path
-          only_if { supports?("publish") }
+          only_if { supports?('publish') }
         end
 
-        ruby_block "log release_hash" do
+        ruby_block 'log release_hash' do
           block do
             message = "Revision #{new_resource.revision}" \
               " (at #{new_resource.release_hash})" \
@@ -621,18 +621,18 @@ action_class do
         end
       end
 
-      converge_by "execute after_publish" do
+      converge_by 'execute after_publish' do
         instance_eval(&new_resource.after_publish)
       end if new_resource.after_publish
-    end if supports?("publish")
+    end if supports?('publish')
   end
 
   # Actions to perform when cleaning up previous releases
   # @since 0.1.0
   def delete_releases
-    converge_by "delete previous releases" do
+    converge_by 'delete previous releases' do
       chop = -1 - new_resource.keep_releases
-      current_release = if ::File.exists?(new_resource.current_path)
+      current_release = if ::File.exist?(new_resource.current_path)
                         then ::File.realpath(new_resource.current_path)
                         end
       all_releases[0..chop].each do |old_release|

@@ -29,7 +29,7 @@ property :user,
 # The repository owning group (git.group)
 property :group,
   kind_of: String,
-  default: lazy { |r| r.user }
+  default: lazy(&:user)
 
 # The repository depth (git.depth) for shallow cloning
 property :depth,
@@ -79,7 +79,7 @@ end
 
 action :sync do
   directory new_resource.destination do
-		user new_resource.user
+    user new_resource.user
     group new_resource.group
     recursive true
   end
@@ -115,4 +115,3 @@ action :sync do
     end
   end
 end
-

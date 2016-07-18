@@ -1,5 +1,5 @@
-# The deploy_template resource is used to deploy an application template 
-# and incorporates some of the application logic that is specific to the 
+# The deploy_template resource is used to deploy an application template
+# and incorporates some of the application logic that is specific to the
 # deploy_ cookbooks.
 
 resource_name :common_deploy_template
@@ -20,7 +20,7 @@ property :application,
 
 # Source of the template
 property :source,
-  kind_of: [String,Array],
+  kind_of: [String, Array],
   desired_state: false
 
 # If not local, the cookbook that owns the template
@@ -60,11 +60,11 @@ action_class do
 end
 
 action :create do
-  # Create a template variables hash which is equivalent to a merge of : 
+  # Create a template variables hash which is equivalent to a merge of :
   # - node[:deploy_configs][#{app_name}]
   # - new_resource.variables
-  template_variables = Chef::Mixin::DeepMerge.
-    merge(new_resource.variables, new_resource.configs)
+  template_variables = Chef::Mixin::DeepMerge
+    .merge(new_resource.variables, new_resource.configs)
 
   r = template new_resource.name
   r.variables template_variables
@@ -80,4 +80,3 @@ action :delete do
     action :delete
   end
 end
-
