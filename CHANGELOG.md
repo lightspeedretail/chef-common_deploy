@@ -1,6 +1,11 @@
 common_deploy
 ============
 
+v0.1.5
+------
+* Bugfix helpers not creating when no block is provided
+* Fix issue where SCM provider is not instantiating on older chefs
+
 v0.1.4
 ------
 * Rubocop fixes
