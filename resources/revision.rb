@@ -417,7 +417,7 @@ action_class do
       group new_resource.group
       cwd   new_resource.release_path
       environment new_resource.environment
-      instance_eval(&block)
+      instance_eval(&block) if block
     end
   end
 
@@ -429,7 +429,7 @@ action_class do
       path  release_path(name)
       owner new_resource.user
       group new_resource.group
-      instance_eval(&block)
+      instance_eval(&block) if block
     end
   end
 
@@ -441,7 +441,7 @@ action_class do
       path  shared_path(name)
       owner new_resource.user
       group new_resource.group
-      instance_eval(&block)
+      instance_eval(&block) if block
     end
   end
 
@@ -482,10 +482,16 @@ action_class do
         end
       end
 
-      new_resource.scm_resource.new(new_resource.cache_path, run_context) do
-        %w(user group repository revision scm_options).each do |p|
+      scm = declare_resource(
+        new_resource.scm_resource.name,
+        new_resource.cache_path,
+        create_if_missing: true
+      ) do
+        %w(user group repository revision).each do |p|
           send(p, new_resource.send(p))
-          action :sync
+        end
+        scm_options.each do |k,v|
+          send(k, v)
         end
       end
 
