@@ -212,12 +212,13 @@ property :scm_resource,
 # @since 0.1.0
 def scm_provider(run_context = nil)
   current_resource = self
-  resource = scm_resource.new(current_resource.name, run_context)
+  resource = scm_resource.new('detect', run_context)
   resource.repository   current_resource.repository
   resource.revision     current_resource.revision
   current_resource.scm_options.each do |k, v|
     resource.send(k, v)
   end
+  action :nothing
   resource.provider_for_action(:checkout)
 end
 
@@ -482,10 +483,10 @@ action_class do
         end
       end
 
-      scm = declare_resource(
-        new_resource.scm_resource.name,
+      declare_resource(
+        new_resource.scm_resource.name.split('::').last.downcase,
         new_resource.cache_path,
-        create_if_missing: true
+        create_if_missing: false
       ) do
         %w(user group repository revision).each do |p|
           send(p, new_resource.send(p))

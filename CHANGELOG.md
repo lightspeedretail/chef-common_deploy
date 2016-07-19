@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.1.6
+------
+* Do it more betterly
+
 v0.1.5
 ------
 * Bugfix helpers not creating when no block is provided
