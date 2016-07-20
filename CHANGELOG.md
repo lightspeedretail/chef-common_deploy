@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.1.7
+------
+* Upgrade run helpers to use bash rather than execute and thus ensure that we support commands such as npm and rbenv that may otherwise have issues.
+
 v0.1.6
 ------
 * Do it more betterly
