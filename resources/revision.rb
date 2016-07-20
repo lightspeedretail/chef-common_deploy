@@ -6,6 +6,45 @@
 # execution hooks granting a better control over how and when steps are
 # executed.
 #
+# The full sequence of events is as follows:
+#
+### Load current resource
+# - detect whether this resource has changed
+#   - is there a newer release hash on upstream?
+#   - is there a the release published?
+### Cache phase
+# - if support_force
+#   - delete the existing release folder
+# - if release_hash has changed
+#   - update the cache (utilizing scm_resource)
+#   - copy the cache to the new release folder
+#   - create the REVISION file in the release folder
+#   * execute the after_cache callback
+### Build phase
+# * execute the before_build callback
+# - if purge_on_build has changed
+#   - delete directories recursively from the release folder
+# - if create_on_build has changed
+#   - create directories recursively in the release folder
+# - if symlink_on_build has changed
+#   - symlink release paths to shared paths
+# * execute the after_build callback
+# - if release_hash has changed
+#   * execute the after_updated callback
+### Migration phase
+# - * execute the validate_migrate callback
+# - if release_hash or current_path have changed and supports_migrate
+#   * execute the before_migration callback
+#   * execute the migrate_action callbackk
+#   * execute the after_migration callback
+### Publish phase
+# - * execute the validate_publish callback
+# - if release_hash or current_path have changed and supports_publish
+#   * execute the before_publish callback
+#   * create the current symlink
+#   * log the publishing of this release
+#   * execute the after_publish callback
+#
 # @example
 # ```ruby
 # common_deploy_revision '/var/www/myapp' do
@@ -232,6 +271,10 @@ end
 
 def after_build(&block)
   set_or_return(:after_build, block, kind_of: Proc)
+end
+
+def after_updated(&block)
+  set_or_return(:after_updated, block, kind_of: Proc)
 end
 
 def validate_migrate(&block)
@@ -570,6 +613,12 @@ action_class do
     converge_by 'execute after_build' do
       instance_eval(&new_resource.after_build)
     end if new_resource.after_build
+
+    converge_if_changed :release_hash do
+      converge_by 'execute after_updated' do
+        instance_eval(&new_resource.after_updated)
+      end if new_resource.after_updated
+    end
   end
 
   # Actions to perform when executing database or system migrations.
@@ -613,7 +662,6 @@ action_class do
       converge_by "publish #{new_resource.release_hash}" do
         link current_path do
           to release_path
-          only_if { supports?('publish') }
         end
 
         ruby_block 'log release_hash' do
