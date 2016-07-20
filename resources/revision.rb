@@ -413,7 +413,8 @@ action_class do
   # path context.
   # @since 0.1.0
   def run(command, &block)
-    execute command do
+    bash command do
+      code  command
       user  new_resource.user
       group new_resource.group
       cwd   new_resource.release_path
