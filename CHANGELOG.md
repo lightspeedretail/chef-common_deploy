@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.1.9
+------
+* Add newline to the revisions file
+
 v0.1.8
 ------
 * Add after\_updated callback to revision resource
