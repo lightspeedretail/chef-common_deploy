@@ -668,7 +668,7 @@ action_class do
           block do
             message = "Revision #{new_resource.revision}" \
               " (at #{new_resource.release_hash})" \
-              " deployed on #{DateTime.now.strftime('%Y%m%d%H%M%S%L')}"
+              " deployed on #{DateTime.now.strftime('%Y%m%d%H%M%S%L')}\n"
 
             ::File.open(new_resource.revisions_path, 'a') do |f|
               f.write("#{message}\n")
