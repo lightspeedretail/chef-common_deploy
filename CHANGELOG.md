@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.1.10
+-------
+* Bugfix issue with deployments
+
 v0.1.9
 ------
 * Add newline to the revisions file
