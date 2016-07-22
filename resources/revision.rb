@@ -252,6 +252,8 @@ property :scm_resource,
 def scm_provider(run_context = nil)
   current_resource = self
   resource = scm_resource.new('detect', run_context)
+  resource.user         current_resource.user
+  resource.group        current_resource.group
   resource.repository   current_resource.repository
   resource.revision     current_resource.revision
   current_resource.scm_options.each do |k, v|
@@ -309,7 +311,7 @@ end
 # what code paths will be executed within the provider.
 # @since 0.1.0
 load_current_value do |desired|
-  %w(repository revision).each do |p|
+  %w(user group repository revision scm_options).each do |p|
     send(p, desired.send(p))
   end
 
@@ -535,7 +537,7 @@ action_class do
         %w(user group repository revision).each do |p|
           send(p, new_resource.send(p))
         end
-        scm_options.each do |k,v|
+        new_resource.scm_options.each do |k,v|
           send(k, v)
         end
       end
