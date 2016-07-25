@@ -22,11 +22,8 @@ Any
 
 - `order`: The optional ordering in which we will deploy applications, defaults to *100*.
 - `configuration`: A free-form hash used to provide more global attributes to templates. These will serve as the base onto which specific template variables will be merged.
-- `repository`: This hash contains attributes which will be passed to the `common_deploy_repository` custom resource to deploy a git repository.
-- `templates`: This hash contains key => value pairs describing `common_deploy_template` custom resource definitions which mostly drive template creation.
 
 # Libraries
 
 - `CommonDeploy::Applications`: A helper library providing the business logic behind how we iterate over applications and apply the default attributes.
-- `CommonDeploy::Configs`: A helper library providing the business logic behind how we iterate over application configs. 
 

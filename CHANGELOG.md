@@ -4,6 +4,9 @@ common_deploy
 v0.2.0
 ------
 * Remove template and repository resources which quite simply don't bring anything to the game in their current state. Needless wrappers are needless.
+* Rename default revision action to install from deploy
+* Rewrite CommonDeploy::Application library to streamline things
+
 
 v0.1.10
 -------
