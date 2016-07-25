@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.2.0
+------
+* Remove template and repository resources which quite simply don't bring anything to the game in their current state. Needless wrappers are needless.
+
 v0.1.10
 -------
 * Bugfix issue with deployments
