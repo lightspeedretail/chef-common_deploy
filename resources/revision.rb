@@ -356,7 +356,7 @@ load_current_value do |desired|
   end
 end
 
-action :deploy do
+action :install do
   purge_release
   cache_release
   build_release
@@ -537,7 +537,7 @@ action_class do
         %w(user group repository revision).each do |p|
           send(p, new_resource.send(p))
         end
-        new_resource.scm_options.each do |k,v|
+        new_resource.scm_options.each do |k, v|
           send(k, v)
         end
       end

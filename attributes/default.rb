@@ -19,15 +19,14 @@ default[:common_deploy].tap do |config|
   #           "host": "db.domain.com"
   #         }
   #       },
-  #       "repository": {
+  #       "revision": {
   #         "revision": "production",
   #         "user": "www-data",
   #         "group": "www-data"
   #       },
   #     },
   #     "frontend": {
-  #       "repository": {
-  #         "destination": "/var/www/frontend",
+  #       "revision": {
   #         "repository": "git://github.com/something/frontend"
   #       }
   #     }
