@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.2.2
+------
+* Bugfix
+
 v0.2.1
 ------
 * Add additional guards to the `cp`, purge and build resources to ensure that
