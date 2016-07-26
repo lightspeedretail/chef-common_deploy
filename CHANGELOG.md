@@ -1,6 +1,11 @@
 common_deploy
 ============
 
+v0.2.1
+------
+* Add additional guards to the `cp`, purge and build resources to ensure that
+we can better survive rollbacks.
+
 v0.2.0
 ------
 * Remove template and repository resources which quite simply don't bring anything to the game in their current state. Needless wrappers are needless.
