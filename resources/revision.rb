@@ -619,8 +619,8 @@ action_class do
           target_file release_path(dst)
           to shared_path(src)
           only_if do
-            !::File.exist?(shared_path(src)) ||
-            ::File.symlink?(shared_path(src))
+            !::File.exist?(release_path(src)) ||
+            ::File.symlink?(release_path(src))
           end
         end
       end
