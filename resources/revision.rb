@@ -556,6 +556,9 @@ action_class do
             preserve: true
           )
         end
+        not_if do
+          ::File.exist?(release_path('REVISION'))
+        end
       end
 
       file 'save release revision' do
@@ -587,8 +590,12 @@ action_class do
           path release_path(dst)
           recursive true
           action :delete
-          only_if { ::File.directory?(release_path(dst)) }
-          not_if { ::File.symlink?(release_path(dst)) }
+          only_if do
+            ::File.directory?(release_path(dst))
+          end
+          not_if do
+            ::File.symlink?(release_path(dst))
+          end
         end
       end
     end
@@ -599,6 +606,9 @@ action_class do
           path  release_path(dst)
           owner new_resource.user
           group new_resource.group
+          not_if do
+            ::File.symlink?(release_path(dst))
+          end
         end
       end
     end
@@ -608,6 +618,10 @@ action_class do
         link release_name(dst) do
           target_file release_path(dst)
           to shared_path(src)
+          only_if do
+            !::File.exist?(shared_path(src)) ||
+            ::File.symlink?(shared_path(src))
+          end
         end
       end
     end
