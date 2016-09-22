@@ -1,6 +1,12 @@
 common_deploy
 ============
 
+v0.3.0
+------
+* Bugfix: Remove extra newline in revision log
+* Refactor release copy to ignore the .git folder
+* Add new before_delete callback and refactor delete_releases
+
 v0.2.2
 ------
 * Bugfix
