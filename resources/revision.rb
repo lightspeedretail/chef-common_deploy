@@ -715,7 +715,7 @@ action_class do
               " deployed on #{DateTime.now.strftime('%Y%m%d%H%M%S%L')}\n"
 
             ::File.open(new_resource.revisions_path, 'a') do |f|
-              f.write("#{message}\n")
+              f.write("#{message}")
             end
           end
         end
