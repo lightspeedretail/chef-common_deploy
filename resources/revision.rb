@@ -307,6 +307,13 @@ def after_publish(&block)
   set_or_return(:after_publish, block, kind_of: Proc)
 end
 
+# Callback executed before an expired release is deleted.
+# The Proc will receive the release_path that would be deleted.
+# @since 0.3.0
+def before_delete(&block)
+  set_or_return(:before_delete, block, kind_of: Proc)
+end
+
 # Load the current resource to determine which portions have changed and thus
 # what code paths will be executed within the provider.
 # @since 0.1.0
@@ -497,6 +504,28 @@ action_class do
   def all_releases
     ::Dir.glob(::File.join(new_resource.deploy_to, '/releases/*'))
       .sort_by { |path| ::File.mtime(path) }
+  end
+
+  # Method returning a list of release paths which may be removed
+  # @since 0.3.0
+  def expired_releases
+    chop = -1 - new_resource.keep_releases
+    current_release = if ::File.exist?(new_resource.current_path)
+                      then ::File.realpath(new_resource.current_path)
+                      end
+    all_releases[0..chop].delete_if do |release|
+      [current_release, new_resource.release_path].include?(release)
+    end
+  end
+
+  # Method to delete a release_path
+  # @since 0.3.0
+  def delete_release(release_path)
+    directory "releases/#{::File.basename(release_path)}" do
+      path release_path
+      recurive true
+      action :delete
+    end
   end
 
   # Actions to perform when opting to force_deploy.
@@ -703,19 +732,11 @@ action_class do
   # @since 0.1.0
   def delete_releases
     converge_by 'delete previous releases' do
-      chop = -1 - new_resource.keep_releases
-      current_release = if ::File.exist?(new_resource.current_path)
-                        then ::File.realpath(new_resource.current_path)
-                        end
-      all_releases[0..chop].each do |old_release|
-        next if old_release == current_release
-        next if old_release == new_resource.release_path
-
-        directory "releases/#{::File.basename(old_release)}" do
-          path old_release
-          recursive true
-          action :delete
+      expired_releases.each do |release_path|
+        if new_resource.before_delete
+          instance_exec(&new_resource.before_delete, release_path)
         end
+        delete_release(release_path)
       end
     end
   end
