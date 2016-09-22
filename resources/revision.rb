@@ -579,9 +579,12 @@ action_class do
 
       ruby_block 'copy cached checkout to release_path' do
         block do
-          source_paths = Dir.glob("*", File::FNM_DOTMATCH) - %w[. .. .git]
+          source_paths = ::Dir.glob(
+            cache_path('*'), 
+            ::File::FNM_DOTMATCH
+          ) - [cache_path('.'), cache_path('..'), cache_path('.git')]
           source_paths.each do |path|
-            FileUtils.cp_r(cache_path(path), release_path, preserve: true)
+            FileUtils.cp_r(path, release_path, preserve: true)
           end
         end
         not_if do
@@ -733,7 +736,7 @@ action_class do
     converge_by 'delete previous releases' do
       expired_releases.each do |release_path|
         if new_resource.before_delete
-          instance_exec(&new_resource.before_delete, release_path)
+          instance_exec(release_path, &new_resource.before_delete)
         end
         delete_release(release_path)
       end
