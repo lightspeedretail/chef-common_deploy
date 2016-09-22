@@ -579,11 +579,10 @@ action_class do
 
       ruby_block 'copy cached checkout to release_path' do
         block do
-          FileUtils.cp_r(
-            cache_path('.'),
-            release_path,
-            preserve: true
-          )
+          source_paths = Dir.glob("*", File::FNM_DOTMATCH) - %w[. .. .git]
+          source_paths.each do |path|
+            FileUtils.cp_r(cache_path(path), release_path, preserve: true)
+          end
         end
         not_if do
           ::File.exist?(release_path('REVISION'))
