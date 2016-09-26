@@ -523,7 +523,7 @@ action_class do
   def delete_release(release_path)
     directory "releases/#{::File.basename(release_path)}" do
       path release_path
-      recurive true
+      recursive true
       action :delete
     end
   end
