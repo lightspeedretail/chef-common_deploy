@@ -345,7 +345,9 @@ load_current_value do |desired|
     desired.symlink_on_build.select do |src, dst|
       src_path = ::File.join(desired.shared_path, src)
       dst_path = ::File.join(desired.release_path, dst)
-      ::File.symlink?(dst_path) and ::File.realpath(dst_path) == src_path
+      ::File.symlink?(dst_path) &&
+        ::File.exist?(dst_path) &&
+        (::File.realpath(dst_path) == src_path)
     end
   end
 
