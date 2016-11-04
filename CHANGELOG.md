@@ -1,6 +1,10 @@
 common_deploy
 ============
 
+v0.3.2
+------
+* Resolve issue detecting broken symlinks
+
 v0.3.0
 ------
 * Bugfix: Remove extra newline in revision log
