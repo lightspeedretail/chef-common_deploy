@@ -202,13 +202,19 @@ property :release_hash,
   required: true,
   default: lazy { |r| r.scm_provider.target_revision }
 
+# Date of the release used when determining the release\_path and when
+# logging to the revisions.log file.
+# @since 1.0.0
+property :release_date,
+  kind_of: String,
+  default: lazy { DateTime.now.strftime('%Y%m%d%H%M%S%L') }
+
 # Absolute path to the release directory which is used to determine what the
 # current_path symlink should point to.
 # @since 0.1.0
 property :release_path,
   kind_of: String,
-  identity: true,
-  default: lazy { |r| ::File.join(r.releases_path, r.release_hash) }
+  identity: true
 
 # Absolute path to the directory containing the various releases
 # @since 0.1.0
@@ -314,6 +320,54 @@ def before_delete(&block)
   set_or_return(:before_delete, block, kind_of: Proc)
 end
 
+# Method returning a list of paths for all current releases
+# @since 1.0.0
+def current_release_paths
+  ::Dir.glob(::File.join(deploy_to, '/releases/*')).sort
+end
+
+# Method returning a list of release paths which may be removed
+# @since 1.0.0
+def expired_release_paths
+  chop = -1 - keep_releases
+  current_release = if ::File.exist?(current_path)
+                    then ::File.realpath(current_path)
+                    end
+  current_release_paths[0..chop].delete_if do |release|
+    [current_release, release_path].include?(release)
+  end
+end
+
+# Method returning a hash of paths and their respective release hashes
+# @since 1.0.0
+def current_release_revisions
+  current_release_paths.map do |release_path|
+    revision = release_path_revision(release_path)
+    [release_path, revision]
+  end.to_h
+end
+
+# Method returning the revision for a given release_path
+# @since 0.1.0
+def release_path_revision(release_path)
+  revision_path = ::File.join(release_path, 'REVISION')
+  ::File.read(revision_path).strip if ::File.exist?(revision_path)
+end
+
+# Method returning a release_path for a given revision
+# @since 1.0.0
+def revision_release_path(revision)
+  current_release_revisions.select do |_, revision_hash|
+    revision_hash == revision
+  end.keys.first
+end
+
+# Method returning the default release_path for new revisions
+# @since 1.0.0
+def default_release_path
+  ::File.join(releases_path, release_date)
+end
+
 # Load the current resource to determine which portions have changed and thus
 # what code paths will be executed within the provider.
 # @since 0.1.0
@@ -326,7 +380,22 @@ load_current_value do |desired|
     send(p, desired.send(p))
   end
 
+  if desired.support_force then desired.release_path default_release_path
+  elsif !desired.release_path
+    detected_release_path = revision_release_path(release_hash)
+    detected_release_path = default_release_path unless detected_release_path
+    desired.release_path detected_release_path
+  end
+
   current_value_does_not_exist! unless ::File.exist?(desired.release_path)
+
+  if ::File.exist?(desired.current_path)
+    current_release = ::File.readlink(desired.current_path)
+    current_release = nil unless ::File.exist?(current_release)
+    release_hash release_path_revision(current_release) if current_release
+    release_path current_release if current_release
+  else current_path 'missing'
+  end
 
   purge_on_build begin
     desired.purge_on_build.select do |path|
@@ -349,19 +418,6 @@ load_current_value do |desired|
         ::File.exist?(dst_path) &&
         (::File.realpath(dst_path) == src_path)
     end
-  end
-
-  current_path 'missing' unless ::File.exist?(desired.current_path)
-
-  release_path begin
-    path = ::File.readlink(current_path)
-    ::File.exist?(release_path) ? path : nil
-  end if ::File.exist?(current_path)
-
-  if desired.support_force
-    release_hash 'force_deploy'
-  else
-    release_hash ::File.basename(release_path)
   end
 end
 
@@ -501,25 +557,6 @@ action_class do
     end
   end
 
-  # Method returning a list of paths for all current releases
-  # @since 0.1.0
-  def all_releases
-    ::Dir.glob(::File.join(new_resource.deploy_to, '/releases/*'))
-      .sort_by { |path| ::File.mtime(path) }
-  end
-
-  # Method returning a list of release paths which may be removed
-  # @since 0.3.0
-  def expired_releases
-    chop = -1 - new_resource.keep_releases
-    current_release = if ::File.exist?(new_resource.current_path)
-                      then ::File.realpath(new_resource.current_path)
-                      end
-    all_releases[0..chop].delete_if do |release|
-      [current_release, new_resource.release_path].include?(release)
-    end
-  end
-
   # Method to delete a release_path
   # @since 0.3.0
   def delete_release(release_path)
@@ -573,25 +610,11 @@ action_class do
         end
       end
 
-      directory 'create release_path' do
-        path  release_path
-        owner new_resource.user
-        group new_resource.group
-      end
-
-      ruby_block 'copy cached checkout to release_path' do
-        block do
-          source_paths = ::Dir.glob(
-            cache_path('*'), 
-            ::File::FNM_DOTMATCH
-          ) - [cache_path('.'), cache_path('..'), cache_path('.git')]
-          source_paths.each do |path|
-            FileUtils.cp_r(path, release_path, preserve: true)
-          end
-        end
-        not_if do
-          ::File.exist?(release_path('REVISION'))
-        end
+      common_deploy_directory_copy release_path do
+        source      cache_path
+        owner       new_resource.user
+        group       new_resource.group
+        exclude     '.git'
       end
 
       file 'save release revision' do
@@ -717,7 +740,7 @@ action_class do
           block do
             message = "Revision #{new_resource.revision}" \
               " (at #{new_resource.release_hash})" \
-              " deployed on #{DateTime.now.strftime('%Y%m%d%H%M%S%L')}\n"
+              " deployed on #{new_resource.release_date}\n"
 
             ::File.open(new_resource.revisions_path, 'a') do |f|
               f.write("#{message}")
@@ -736,7 +759,7 @@ action_class do
   # @since 0.1.0
   def delete_releases
     converge_by 'delete previous releases' do
-      expired_releases.each do |release_path|
+      new_resource.expired_release_paths.each do |release_path|
         if new_resource.before_delete
           instance_exec(release_path, &new_resource.before_delete)
         end
