@@ -1,5 +1,11 @@
-common_deploy
+common\_deploy
 ============
+
+v1.0.0
+------
+* Breaking Change
+  * Instead of creating releases as releases/$release\_hash$ we create releases/$timestamp as to support re-deploying via force\_deploy.
+* Add a common\_deploy\_directory\_copy resource which will copy the contents of one folder to another. 
 
 v0.3.2
 ------
