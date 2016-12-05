@@ -348,7 +348,7 @@ def current_release_revisions
 end
 
 # Method returning the revision for a given release_path
-# @since 0.1.0
+# @since 1.0.0
 def release_path_revision(release_path)
   revision_path = ::File.join(release_path, 'REVISION')
   ::File.read(revision_path).strip if ::File.exist?(revision_path)
