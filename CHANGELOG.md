@@ -1,6 +1,11 @@
 common\_deploy
 ============
 
+v1.1.0
+------
+* Removed the lazy evaluation for the timestamp used for the deploy log and release folder to harmonize the values for the both of them
+* Made the evaluation of the current folder lazy so that the cleanup post-deploy cleans the previously deployed code
+
 v1.0.0
 ------
 * Breaking Change
