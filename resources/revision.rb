@@ -326,9 +326,7 @@ end
 # @since 1.1.0
 def current_release_paths
   paths_array = Array.new
-  paths_array.push(if ::File.exist?(current_path)
-                   then ::File.realpath(current_path)
-                   end)
+  paths_array.push(::File.realpath(current_path)) if ::File.exists?(current_path)
   paths_array.push(::Dir.glob(::File.join(deploy_to, '/releases/*')).sort).flatten.compact
 end
 
@@ -336,9 +334,7 @@ end
 # @since 1.0.0
 def expired_release_paths
   chop = -1 - keep_releases
-  current_release = if ::File.exist?(current_path)
-                      then ::File.realpath(current_path)
-                    end
+  current_release = ::File.realpath(current_path) if ::File.exist?(current_path)
   current_release_paths[0..chop].delete_if do |release|
     [current_release, release_path].include?(release)
   end
