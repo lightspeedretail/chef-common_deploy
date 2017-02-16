@@ -207,7 +207,7 @@ property :release_hash,
 # @since 1.0.0
 property :release_date,
   kind_of: String,
-  default: lazy { DateTime.now.strftime('%Y%m%d%H%M%S%L') }
+  default: DateTime.now.strftime('%Y%m%d%H%M%S%L')
 
 # Absolute path to the release directory which is used to determine what the
 # current_path symlink should point to.
@@ -322,17 +322,19 @@ end
 
 # Method returning a list of paths for all current releases
 # @since 1.0.0
+# Amended to prioritize validating the current folder's revision
+# @since 1.1.0
 def current_release_paths
-  ::Dir.glob(::File.join(deploy_to, '/releases/*')).sort
+  paths_array = Array.new
+  paths_array.push(::File.realpath(current_path)) if ::File.exists?(current_path)
+  paths_array.push(::Dir.glob(::File.join(deploy_to, '/releases/*')).sort).flatten.compact
 end
 
 # Method returning a list of release paths which may be removed
 # @since 1.0.0
 def expired_release_paths
   chop = -1 - keep_releases
-  current_release = if ::File.exist?(current_path)
-                    then ::File.realpath(current_path)
-                    end
+  current_release = ::File.realpath(current_path) if ::File.exist?(current_path)
   current_release_paths[0..chop].delete_if do |release|
     [current_release, release_path].include?(release)
   end
